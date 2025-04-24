@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +50,39 @@ class BLETestPage extends StatefulWidget {
 
 class _BLETestPageState extends State<BLETestPage> {
   List<BluetoothDevice> foundDevices = [];
+  int clickCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadClickCount();
+  }
+
+  Future<void> loadClickCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        clickCount = prefs.getInt('clickCount') ?? 0;
+      });
+    } catch (e) {
+      debugPrint("⚠️ Fehler beim Laden von SharedPreferences: $e");
+    }
+  }
+
+  Future<void> incrementClickCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        clickCount++;
+      });
+      await prefs.setInt('clickCount', clickCount);
+    } catch (e) {
+      debugPrint("⚠️ Fehler beim Speichern von SharedPreferences: $e");
+    }
+  }
 
   void startBLEScan() async {
-    setState(() => foundDevices.clear());
+    foundDevices.clear();
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
     FlutterBluePlus.scanResults.listen((results) {
       setState(() {
@@ -67,39 +98,42 @@ class _BLETestPageState extends State<BLETestPage> {
       appBar: AppBar(
         title: const Text("BLE-Test"),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: startBLEScan,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: blaugrau,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: incrementClickCount,
+              child: Text("Geklickt: $clickCount mal"),
             ),
-            child: const Text("Nach BLE-Geräten suchen"),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              itemCount: foundDevices.length,
-              itemBuilder: (context, index) {
-                final device = foundDevices[index];
-                return ListTile(
-                  title: Text(
-                    device.platformName.isNotEmpty
-                        ? device.platformName
-                        : "Unbekanntes Gerät",
-                    style: const TextStyle(color: blaugrau),
-                  ),
-                  subtitle: Text(
-                    "ID: ${device.remoteId.str}",
-                    style: const TextStyle(color: blaugrau),
-                  ),
-                );
-              },
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: startBLEScan,
+              child: const Text("BLE-Scan starten"),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: foundDevices.length,
+                itemBuilder: (context, index) {
+                  final device = foundDevices[index];
+                  return ListTile(
+                    title: Text(
+                      device.platformName.isNotEmpty
+                          ? device.platformName
+                          : "Unbekanntes Gerät",
+                      style: const TextStyle(color: blaugrau),
+                    ),
+                    subtitle: Text(
+                      "ID: ${device.remoteId.str}",
+                      style: const TextStyle(color: blaugrau),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
