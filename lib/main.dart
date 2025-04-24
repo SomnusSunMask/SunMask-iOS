@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:geolocator/geolocator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,10 +10,10 @@ void main() {
     DeviceOrientation.portraitUp,
   ]).then((_) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.yellow,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.yellow,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarColor: Colors.black,
+      systemNavigationBarColor: Colors.black,
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
     ));
     runApp(const MyApp());
   });
@@ -26,78 +24,72 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const blaugrau = Color(0xFF7A9CA3);
     return MaterialApp(
-      title: 'BLE-Test',
+      title: 'SunMask Test',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.yellow,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.yellow,
-          foregroundColor: Colors.black,
-          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
-        ),
+        scaffoldBackgroundColor: Colors.black,
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: blaugrau),
         ),
       ),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [Locale('de')],
-      home: const BleTestPage(),
+      supportedLocales: const [Locale('de', '')],
+      home: const BLETestPage(),
     );
   }
 }
 
-class BleTestPage extends StatefulWidget {
-  const BleTestPage({super.key});
+class BLETestPage extends StatefulWidget {
+  const BLETestPage({super.key});
 
   @override
-  State<BleTestPage> createState() => _BleTestPageState();
+  State<BLETestPage> createState() => _BLETestPageState();
 }
 
-class _BleTestPageState extends State<BleTestPage> {
-  List<String> devices = [];
+class _BLETestPageState extends State<BLETestPage> {
+  List<BluetoothDevice> foundDevices = [];
 
-  Future<void> scanForDevices() async {
-    final locationStatus = await Permission.locationWhenInUse.request();
-    final bluetoothStatus = await Permission.bluetoothScan.request();
+  @override
+  void initState() {
+    super.initState();
+    startBLEScan();
+  }
 
-    if (!locationStatus.isGranted || !bluetoothStatus.isGranted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Bluetooth oder Standort nicht erlaubt!")),
-      );
-      return;
-    }
-
-    setState(() => devices.clear());
-
-    FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
-
+  void startBLEScan() async {
+    foundDevices.clear();
+    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
     FlutterBluePlus.scanResults.listen((results) {
-      for (var r in results) {
-        if (!devices.contains(r.device.name) && r.device.name.isNotEmpty) {
-          setState(() {
-            devices.add(r.device.name);
-          });
-        }
-      }
+      setState(() {
+        foundDevices = results.map((r) => r.device).toList();
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    const blaugrau = Color(0xFF7A9CA3);
     return Scaffold(
-      appBar: AppBar(title: const Text("BLE-Test")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: scanForDevices,
-              child: const Text("Nach BLE-Geräten suchen"),
+      appBar: AppBar(
+        title: const Text("BLE-Test"),
+      ),
+      body: ListView.builder(
+        itemCount: foundDevices.length,
+        itemBuilder: (context, index) {
+          final device = foundDevices[index];
+          return ListTile(
+            title: Text(
+              device.platformName.isNotEmpty
+                  ? device.platformName
+                  : "Unbekanntes Gerät",
+              style: const TextStyle(color: blaugrau),
             ),
-            const SizedBox(height: 16),
-            ...devices.map((name) => Text(name)).toList(),
-          ],
-        ),
+            subtitle: Text(
+              "ID: ${device.remoteId.str}",
+              style: const TextStyle(color: blaugrau),
+            ),
+          );
+        },
       ),
     );
   }
