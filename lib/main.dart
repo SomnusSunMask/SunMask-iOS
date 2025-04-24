@@ -50,14 +50,8 @@ class BLETestPage extends StatefulWidget {
 class _BLETestPageState extends State<BLETestPage> {
   List<BluetoothDevice> foundDevices = [];
 
-  @override
-  void initState() {
-    super.initState();
-    startBLEScan();
-  }
-
   void startBLEScan() async {
-    foundDevices.clear();
+    setState(() => foundDevices.clear());
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
     FlutterBluePlus.scanResults.listen((results) {
       setState(() {
@@ -73,23 +67,39 @@ class _BLETestPageState extends State<BLETestPage> {
       appBar: AppBar(
         title: const Text("BLE-Test"),
       ),
-      body: ListView.builder(
-        itemCount: foundDevices.length,
-        itemBuilder: (context, index) {
-          final device = foundDevices[index];
-          return ListTile(
-            title: Text(
-              device.platformName.isNotEmpty
-                  ? device.platformName
-                  : "Unbekanntes Gerät",
-              style: const TextStyle(color: blaugrau),
+      body: Column(
+        children: [
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: startBLEScan,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: blaugrau,
             ),
-            subtitle: Text(
-              "ID: ${device.remoteId.str}",
-              style: const TextStyle(color: blaugrau),
+            child: const Text("Nach BLE-Geräten suchen"),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: foundDevices.length,
+              itemBuilder: (context, index) {
+                final device = foundDevices[index];
+                return ListTile(
+                  title: Text(
+                    device.platformName.isNotEmpty
+                        ? device.platformName
+                        : "Unbekanntes Gerät",
+                    style: const TextStyle(color: blaugrau),
+                  ),
+                  subtitle: Text(
+                    "ID: ${device.remoteId.str}",
+                    style: const TextStyle(color: blaugrau),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
