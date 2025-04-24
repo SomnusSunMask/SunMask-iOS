@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart'; // NEU
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +54,22 @@ class _BLETestPageState extends State<BLETestPage> {
   @override
   void initState() {
     super.initState();
-    startBLEScan();
+    requestPermissionsAndStartScan();
+  }
+
+  Future<void> requestPermissionsAndStartScan() async {
+    final status = await Permission.bluetoothScan.request();
+    final statusConnect = await Permission.bluetoothConnect.request();
+    if (status.isGranted && statusConnect.isGranted) {
+      startBLEScan();
+    } else {
+      // Optional: Hinweis anzeigen
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bluetooth-Berechtigung erforderlich'),
+        ),
+      );
+    }
   }
 
   void startBLEScan() async {
