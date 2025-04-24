@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:permission_handler/permission_handler.dart'; // NEU
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,10 +12,10 @@ void main() {
     DeviceOrientation.portraitUp,
   ]).then((_) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-      systemNavigationBarColor: Colors.black,
-      systemNavigationBarIconBrightness: Brightness.light,
-      statusBarIconBrightness: Brightness.light,
+      statusBarColor: Colors.yellow,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.yellow,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ));
     runApp(const MyApp());
   });
@@ -25,87 +26,76 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const blaugrau = Color(0xFF7A9CA3);
     return MaterialApp(
-      title: 'SunMask Test',
+      title: 'BLE-Test',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Colors.yellow,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.yellow,
+          foregroundColor: Colors.black,
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
+        ),
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: blaugrau),
+          bodyMedium: TextStyle(color: Colors.black),
         ),
       ),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [Locale('de', '')],
-      home: const BLETestPage(),
+      supportedLocales: const [Locale('de')],
+      home: const BleTestPage(),
     );
   }
 }
 
-class BLETestPage extends StatefulWidget {
-  const BLETestPage({super.key});
+class BleTestPage extends StatefulWidget {
+  const BleTestPage({super.key});
 
   @override
-  State<BLETestPage> createState() => _BLETestPageState();
+  State<BleTestPage> createState() => _BleTestPageState();
 }
 
-class _BLETestPageState extends State<BLETestPage> {
-  List<BluetoothDevice> foundDevices = [];
+class _BleTestPageState extends State<BleTestPage> {
+  List<String> devices = [];
 
-  @override
-  void initState() {
-    super.initState();
-    requestPermissionsAndStartScan();
-  }
-
-  Future<void> requestPermissionsAndStartScan() async {
-    final status = await Permission.bluetoothScan.request();
-    final statusConnect = await Permission.bluetoothConnect.request();
-    if (status.isGranted && statusConnect.isGranted) {
-      startBLEScan();
-    } else {
-      // Optional: Hinweis anzeigen
+  Future<void> scanForDevices() async {
+    final permissionStatus = await Permission.bluetoothScan.request();
+    if (!permissionStatus.isGranted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bluetooth-Berechtigung erforderlich'),
-        ),
+        const SnackBar(content: Text("Bluetooth Scan nicht erlaubt!")),
       );
+      return;
     }
-  }
 
-  void startBLEScan() async {
-    foundDevices.clear();
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
+    setState(() => devices.clear());
+
+    FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
+
     FlutterBluePlus.scanResults.listen((results) {
-      setState(() {
-        foundDevices = results.map((r) => r.device).toList();
-      });
+      for (var r in results) {
+        if (!devices.contains(r.device.name) && r.device.name.isNotEmpty) {
+          setState(() {
+            devices.add(r.device.name);
+          });
+        }
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    const blaugrau = Color(0xFF7A9CA3);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("BLE-Test"),
-      ),
-      body: ListView.builder(
-        itemCount: foundDevices.length,
-        itemBuilder: (context, index) {
-          final device = foundDevices[index];
-          return ListTile(
-            title: Text(
-              device.platformName.isNotEmpty
-                  ? device.platformName
-                  : "Unbekanntes Gerät",
-              style: const TextStyle(color: blaugrau),
+      appBar: AppBar(title: const Text("BLE-Test")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: scanForDevices,
+              child: const Text("Nach BLE-Geräten suchen"),
             ),
-            subtitle: Text(
-              "ID: ${device.remoteId.str}",
-              style: const TextStyle(color: blaugrau),
-            ),
-          );
-        },
+            const SizedBox(height: 16),
+            ...devices.map((name) => Text(name)).toList(),
+          ],
+        ),
       ),
     );
   }
