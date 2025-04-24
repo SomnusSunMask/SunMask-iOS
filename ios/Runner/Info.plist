@@ -55,5 +55,7 @@
 	<!-- ✅ Standortberechtigungen (erforderlich für BLE-Scan) -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Diese App benötigt deinen Standort, um Bluetooth-Geräte in der Nähe zu finden.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Diese App benötigt Zugriff auf deinen Standort, um Bluetooth-Geräte zuverlässig in der Nähe zu erkennen.</string>
 </dict>
 </plist>
