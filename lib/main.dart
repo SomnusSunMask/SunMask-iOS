@@ -1,3 +1,4 @@
+cpp
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -57,10 +58,12 @@ class _BleTestPageState extends State<BleTestPage> {
   List<String> devices = [];
 
   Future<void> scanForDevices() async {
-    final permissionStatus = await Permission.bluetoothScan.request();
-    if (!permissionStatus.isGranted) {
+    final locationStatus = await Permission.locationWhenInUse.request();
+    final bluetoothStatus = await Permission.bluetoothScan.request();
+
+    if (!locationStatus.isGranted || !bluetoothStatus.isGranted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Bluetooth Scan nicht erlaubt!")),
+        const SnackBar(content: Text("Bluetooth oder Standort nicht erlaubt!")),
       );
       return;
     }
