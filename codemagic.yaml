@@ -9,7 +9,6 @@ workflows:
       - name: Set up Flutter dependencies
         script: |
           flutter pub get
-          flutter pub run flutter_launcher_icons:main
       - name: Clean build
         script: flutter clean
       - name: Install CocoaPods
