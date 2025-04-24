@@ -1,24 +1,40 @@
-// main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 void main() {
-  debugPrint(">>> MAIN WIRD AUSGEFÜHRT <<<");
-  runApp(MyTestApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
-class MyTestApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    debugPrint(">>> BUILD WIRD AUSGEFÜHRT <<<");
-
+    const blaugrau = Color(0xFF7A9CA3);
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.yellow,
+      title: 'SunMask Test',
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.black,
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: blaugrau),
+        ),
+      ),
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: const [
+        Locale('de', ''),
+      ],
+      home: const Scaffold(
         body: Center(
           child: Text(
-            "Hello iOS!",
-            style: TextStyle(fontSize: 32, color: Colors.black),
+            "SunMask Testversion",
+            style: TextStyle(fontSize: 26, color: Colors.white),
           ),
         ),
       ),
