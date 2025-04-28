@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     const blaugrau = Color(0xFF7A9CA3);
 
     return MaterialApp(
-      title: 'SunMask',
+      title: 'Schlafmaske',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.black,
@@ -176,7 +176,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
               borderRadius: BorderRadius.circular(12),
             ),
             title: const Text(
-              'SunMask Verbindungsanleitung',
+              'Schlafmaske Verbindungsanleitung',
               style: TextStyle(color: Colors.white),
             ),
             content: Column(
@@ -184,9 +184,9 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text(
-                  '1. Starte deine SunMask und drücke den Startknopf.\n\n'
+                  '1. Starte deine Schlafmaske und drücke den Startknopf.\n\n'
                   '2. Aktualisiere oben rechts, um nach Geräten zu suchen.\n\n'
-                  '3. Tippe auf die angezeigte "SunMask", um dich zu verbinden.\n\n'
+                  '3. Tippe auf die angezeigte "Schlafmaske", um dich zu verbinden.\n\n'
                   '4. Du hast anschließend 60 Sekunden* Zeit, um Weckzeit oder Timer einzustellen.\n\n'
                   'Bei Unklarheiten kannst du später jederzeit auf das Fragezeichen in der Geräteübersicht tippen.',
                   style: TextStyle(color: Colors.white),
@@ -248,7 +248,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
           final id = result.device.remoteId.str;
           final name = result.device.platformName;
 
-          if (name == "SunMask" && !devices.contains(result.device)) {
+          if (name == "Schlafmaske" && !devices.contains(result.device)) {
             devices.add(result.device);
           }
 
@@ -331,7 +331,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
     });
 
     showErrorSnackbar(
-      "❌ Verbindung fehlgeschlagen! Drücke den Startknopf der SunMask, aktualisiere die Geräteliste und versuche es dann erneut.",
+      "❌ Verbindung fehlgeschlagen! Drücke den Startknopf der Schlafmaske, aktualisiere die Geräteliste und versuche es dann erneut.",
     );
   }
 }
@@ -643,7 +643,7 @@ class _InfoPageState extends State<InfoPage> with SingleTickerProviderStateMixin
           child: Column(
             children: List.generate(4, (index) {
               final titles = [
-                'Wie verbinde ich die SunMask?',
+                'Wie verbinde ich die Schlafmaske?',
                 'Wie stelle ich einen Lichtwecker ein?',
                 'Wie weckt mich der Lichtwecker?',
                 'Hinweis zur „eingestellte Lichtwecker“-Seite:'
@@ -654,9 +654,9 @@ class _InfoPageState extends State<InfoPage> with SingleTickerProviderStateMixin
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '1. Starte deine SunMask und drücke den Startknopf.\n'
+                      '1. Starte deine Schlafmaske und drücke den Startknopf.\n'
                       '2. Aktualisiere auf der Somnus-Startseite oben rechts, um nach Geräten zu suchen.\n'
-                      '3. Tippe auf die angezeigte "SunMask", um dich zu verbinden.\n'
+                      '3. Tippe auf die angezeigte "Schlafmaske", um dich zu verbinden.\n'
                       '4. Du hast anschließend 60 Sekunden* Zeit, um Weckzeit oder Timer einzustellen.\n',
                       style: TextStyle(color: blaugrau, fontSize: 16, height: 1.2),
                     ),
@@ -677,7 +677,7 @@ class _InfoPageState extends State<InfoPage> with SingleTickerProviderStateMixin
                   style: TextStyle(color: blaugrau, fontSize: 16, height: 1.2),
                 ),
                 Text(
-                  'Mit der „eingestellte Lichtwecker“-Seite kannst du, ohne die SunMask zu starten, deine eingestellten Lichtwecker überprüfen. Du erreichst sie in der Geräteübersicht mit Klick auf "SunMask (nicht verfügbar)" oder auf das "i".',
+                  'Mit der „eingestellte Lichtwecker“-Seite kannst du, ohne die Schlafmaske zu starten, deine eingestellten Lichtwecker überprüfen. Du erreichst sie in der Geräteübersicht mit Klick auf "Schlafmaske (nicht verfügbar)" oder auf das "i".',
                   style: TextStyle(color: blaugrau, fontSize: 16, height: 1.2),
                 ),
               ];
@@ -1335,7 +1335,7 @@ void showFirstTimeUsageHint() async {
 
   void sendWakeTimeToESP() async {
   if (!widget.device.isConnected) {
-    showErrorSnackbar("❌ bestätigen fehlgeschlagen! Verbinde die SunMask neu.");
+    showErrorSnackbar("❌ bestätigen fehlgeschlagen! Verbinde die Schlafmaske neu.");
     Navigator.pop(context);
     return;
   }
@@ -1403,7 +1403,7 @@ if (selectedWakeTime!.hour == now.hour && selectedWakeTime!.minute == now.minute
 
   void sendTimerToESP() async {
     if (!widget.device.isConnected) {
-      showErrorSnackbar("❌ bestätigen fehlgeschlagen! Verbinde die SunMask neu.");
+      showErrorSnackbar("❌ bestätigen fehlgeschlagen! Verbinde die Schlafmaske neu.");
       Navigator.pop(context);
       return;
     }
@@ -1439,7 +1439,7 @@ if (selectedWakeTime!.hour == now.hour && selectedWakeTime!.minute == now.minute
 
   void clearWakeTimeOrTimer() async {
     if (!widget.device.isConnected) {
-      showErrorSnackbar("❌ Löschen fehlgeschlagen! Verbinde die SunMask neu.");
+      showErrorSnackbar("❌ Löschen fehlgeschlagen! Verbinde die Schlafmaske neu.");
       Navigator.pop(context);
       return;
     }
@@ -1764,7 +1764,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorSnackbar("❌ Verbindung fehlgeschlagen! Drücke den Startknopf der SunMask, aktualisiere die Geräteliste und versuche es dann erneut.");
+      showErrorSnackbar("❌ Verbindung fehlgeschlagen! Drücke den Startknopf der Schlafmaske, aktualisiere die Geräteliste und versuche es dann erneut.");
     } finally {
       if (mounted) {
         setState(() {
@@ -1816,7 +1816,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorSnackbar("❌ Verbindung fehlgeschlagen! Drücke den Startknopf der SunMask, aktualisiere die Geräteliste und versuche es dann erneut.");
+      showErrorSnackbar("❌ Verbindung fehlgeschlagen! Drücke den Startknopf der Schlafmaske, aktualisiere die Geräteliste und versuche es dann erneut.");
     }
   }
 
@@ -1848,7 +1848,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    "Zum Ändern oder Löschen von Timer oder Weckzeit bitte die SunMask starten und verbinden.",
+                    "Zum Ändern oder Löschen von Timer oder Weckzeit bitte die Schlafmaske starten und verbinden.",
                     style: TextStyle(color: blaugrau),
                   ),
                 ),
@@ -1865,7 +1865,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
                 ),
                 onPressed: isConnecting ? null : connectToDeviceById,
                 child: Text(
-                  isConnecting ? "Verbinden..." : "SunMask verbinden",
+                  isConnecting ? "Verbinden..." : "Schlafmaske verbinden",
                   style: const TextStyle(fontSize: 18),
                 ),
               ),
