@@ -1344,7 +1344,7 @@ void showFirstTimeUsageHint() async {
 
   if (widget.alarmCharacteristic != null && selectedWakeTime != null) {
     try {
-      String currentTime = DateFormat("HH:mm").format(DateTime.now());
+      String currentTime = DateFormat("HH:mm:ss").format(DateTime.now());
       String wakeTime =
           "${selectedWakeTime!.hour.toString().padLeft(2, '0')}:${selectedWakeTime!.minute.toString().padLeft(2, '0')}";
       String combinedData = "$currentTime|$wakeTime";
